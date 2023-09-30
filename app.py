@@ -11,7 +11,13 @@ MENU_ITEMS = ["Home", "Panorama do Mercado", "Mapa Mensal", "Fundamentos"]
 
 
 def home():
-    pass
+    col1, col2, col3 = st.columns([1, 2, 3])
+    with col1:
+        st.image("logo_financyllis_transparent_bg.png", width=100)
+    with col2:
+        st.title("Financyllys")
+
+    st.header("An app for financial analysis")
 
 
 def overview():
