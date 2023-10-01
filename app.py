@@ -154,7 +154,39 @@ def overview():
 
 
 def monthly_map():
-    pass
+    st.title("Análise de Retornos Mensais")
+
+    with st.expander("Avaliação de Histórico", expanded=True):
+        option = st.radio("Selecione", ["Índices", "Ações"])
+
+    if option == "Índices":
+        with st.form(key="form_indexes"):
+            ticker = st.selectbox(
+                "Índice", ["Bovespa", "Financials", "Basic Materials"]
+            )
+            analyse_button = st.form_submit_button("Analisar")
+    else:
+        with st.form(key="form_actions"):
+            ticker = st.selectbox("Ações", ["PETR4", "EQTL3", "VALE3"])
+            analyse_button = st.form_submit_button("Analisar")
+
+    # Implementation stopped because of: https://github.com/alvarobartt/investpy/issues/600
+    # if analyse_button:
+    # initial_date = "01/12/1999"
+    # final_date = "01/10/2023"
+
+    # if option == "Índices":
+    #     index_historical_data_df = inv.get_index_historical_data(
+    #         ticker, country="brazil", from_date=initial_date, to_date=final_date, interval="Monthly"
+    #     )["Close"].pct_change()
+
+    #     st.write(index_historical_data_df)
+    # else:
+    #     stock_historical_data_df = inv.get_stock_historical_data(
+    #         ticker, country="Brazil", from_date=initial_date, to_date=final_date, interval="Monthly"
+    #     )["Close"].pct_change()
+
+    #     st.write(stock_historical_data_df)
 
 
 def fundamentals():
