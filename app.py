@@ -3,6 +3,7 @@ from datetime import date
 import investpy as inv
 import matplotlib.pyplot as plt
 import pandas as pd
+import plotly.graph_objects as go
 import seaborn as sns
 import streamlit as st
 import yfinance as yf
@@ -21,7 +22,135 @@ def home():
 
 
 def overview():
-    pass
+    st.title("Panorama do mercado")
+    st.markdown(date.today().strftime("%d/%m/%Y"))
+
+    st.subheader("Mercados pelo Mundo")
+
+    # Download tickers
+    if "assets_df" not in st.session_state:
+        tickers = {
+            "Bovespa": "^BVSP",
+            "S&P500": "^GSPC",
+            "NASDAQ": "^IXIC",
+            "DAX": "^GDAXI",
+            "FTSE 100": "^FTSE",
+            "Cruid Oil": "CL=F",
+            "Gold": "GC=F",
+            "BITCOIN": "BTC-USD",
+            "ETHERUM": "ETH-USD",
+        }
+
+        assets_df = pd.DataFrame({"Asset": tickers.keys(), "Ticker": tickers.values()})
+
+        assets_df["Last_Value"] = ""
+        assets_df["Percentage"] = ""
+
+        placeholder_progress_bar = st.empty()
+        with placeholder_progress_bar:
+            progress_bar = st.progress(value=0, text="Carregando dados...")
+
+        progress_count = 0
+        for index, ticker in enumerate(tickers.values()):
+            quotes_df = yf.download(ticker, period="7d")["Adj Close"]
+            variation = ((quotes_df.iloc[-1] / quotes_df.iloc[-2]) - 1) * 100
+
+            assets_df["Last_Value"][index] = round(quotes_df.iloc[-1], 2)
+            assets_df["Percentage"][index] = round(variation, 2)
+
+            progress_count = round(progress_count + (1 / len(tickers.keys())), 2)
+            if progress_count >= 0.99:
+                progress_count = 1.0
+
+            progress_bar.progress(progress_count)
+
+        placeholder_progress_bar.empty()  # Removes progress bar after tickers' download is completed
+        st.session_state["assets_df"] = assets_df
+
+    assets_df = st.session_state.get("assets_df")
+
+    # Mount tickers' metrics
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        for index in range(3):
+            st.metric(
+                assets_df["Asset"][index],
+                value=assets_df["Last_Value"][index],
+                delta=f"{assets_df['Percentage'][index]}%",
+            )
+
+    with col2:
+        for index in range(3, 6):
+            st.metric(
+                assets_df["Asset"][index],
+                value=assets_df["Last_Value"][index],
+                delta=f"{assets_df['Percentage'][index]}%",
+            )
+
+    with col3:
+        for index in range(6, 9):
+            st.metric(
+                assets_df["Asset"][index],
+                value=assets_df["Last_Value"][index],
+                delta=f"{assets_df['Percentage'][index]}%",
+            )
+
+    # Índices
+    st.markdown("---")
+    st.subheader("Comportamento durante o dia")
+
+    daily_indexes_list = ["IBOV", "S&P500", "NASDAQ"]
+    daily_index = st.selectbox("Selecione o Índice", daily_indexes_list)
+
+    if daily_index == "IBOV":
+        daily_index_df = yf.download("^BVSP", period="1d", interval="5m")
+    if daily_index == "S&P500":
+        daily_index_df = yf.download("^GSPC", period="1d", interval="5m")
+    if daily_index == "NASDAQ":
+        daily_index_df = yf.download("^IXIC", period="1d", interval="5m")
+
+    fig_daily_index = go.Figure(
+        data=[
+            go.Candlestick(
+                x=daily_index_df.index,
+                open=daily_index_df["Open"],
+                high=daily_index_df["High"],
+                low=daily_index_df["Low"],
+                close=daily_index_df["Close"],
+            )
+        ]
+    )
+
+    fig_daily_index.update_layout(title=daily_index, xaxis_rangeslider_visible=False)
+
+    st.plotly_chart(fig_daily_index)
+
+    # Ações
+    st.markdown("---")
+    st.subheader("Ações")
+
+    financial_actions_list = ["PETR4.SA", "VALE3.SA", "EQTL3.SA", "CSNA3.SA"]
+    financial_action = st.selectbox("Selecione a Ação", financial_actions_list)
+
+    financial_action_df = yf.download(financial_action, period="1d", interval="5m")
+
+    fig_financial_action = go.Figure(
+        data=[
+            go.Candlestick(
+                x=financial_action_df.index,
+                open=financial_action_df["Open"],
+                high=financial_action_df["High"],
+                low=financial_action_df["Low"],
+                close=financial_action_df["Close"],
+            )
+        ]
+    )
+
+    fig_financial_action.update_layout(
+        title=financial_action, xaxis_rangeslider_visible=False
+    )
+
+    st.plotly_chart(fig_financial_action)
 
 
 def monthly_map():
