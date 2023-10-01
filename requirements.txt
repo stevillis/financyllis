@@ -1,3 +1,4 @@
+fundamentus==0.2.0
 investpy==1.0.8
 matplotlib==3.8.0
 numpy==1.26.0

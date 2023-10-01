@@ -1,5 +1,6 @@
 from datetime import date
 
+import fundamentus as fd
 import investpy as inv
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -190,7 +191,79 @@ def monthly_map():
 
 
 def fundamentals():
-    pass
+    st.title("Informações de Fundamentos")
+
+    if "tickers_fundamentus_list" not in st.session_state:
+        tickers_fundamentus_list = fd.list_papel_all()
+        st.session_state["tickers_fundamentus_list"] = tickers_fundamentus_list
+
+    tickers_fundamentus_list = st.session_state.get("tickers_fundamentus_list")
+
+    compare_assets = st.checkbox("Comparar 2 ativos")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        with st.expander("Ativo 1", expanded=True):
+            paper1 = st.selectbox(
+                "Selecione o Papel", tickers_fundamentus_list, key="paper1"
+            )
+            paper_info1 = fd.get_detalhes_papel(paper1)
+
+            st.write(
+                f"""
+    **Empresa:** {paper_info1["Empresa"].iloc[0]}
+
+    **Setor:** {paper_info1["Setor"].iloc[0]}
+
+    **Subsetor:** {paper_info1["Subsetor"].iloc[0]}
+
+    **Valor de Mercado:** R$ {float(paper_info1["Valor_de_mercado"].iloc[0]):,.2f}
+
+    **Patrimônio Líquido:** R$ {float(paper_info1["Patrim_Liq"].iloc[0]):,.2f}
+
+    **Receita Liq. 12m:** R$ {float(paper_info1["Receita_Liquida_12m"].iloc[0]):,.2f}
+
+    **Dívida Bruta:** R$ {float(paper_info1["Div_Bruta"].iloc[0]):,.2f}
+
+    **Dívida Líquida:** R$ {float(paper_info1["Div_Liquida"].iloc[0]):,.2f}
+
+    **P/L:** {float(paper_info1["PL"].iloc[0]):,.2f}
+
+    **Dividend Yield:** {paper_info1["Div_Yield"].iloc[0]}
+        """
+            )
+
+    if compare_assets:
+        with col2:
+            with st.expander("Ativo 2", expanded=True):
+                paper2 = st.selectbox(
+                    "Selecione o Papel", tickers_fundamentus_list, key="paper2"
+                )
+                paper_info2 = fd.get_detalhes_papel(paper2)
+
+                st.write(
+                    f"""
+        **Empresa:** {paper_info2["Empresa"].iloc[0]}
+
+        **Setor:** {paper_info2["Setor"].iloc[0]}
+
+        **Subsetor:** {paper_info2["Subsetor"].iloc[0]}
+
+        **Valor de Mercado:** R$ {float(paper_info2["Valor_de_mercado"].iloc[0]):,.2f}
+
+        **Patrimônio Líquido:** R$ {float(paper_info2["Patrim_Liq"].iloc[0]):,.2f}
+
+        **Receita Liq. 12m:** R$ {float(paper_info2["Receita_Liquida_12m"].iloc[0]):,.2f}
+
+        **Dívida Bruta:** R$ {float(paper_info2["Div_Bruta"].iloc[0]):,.2f}
+
+        **Dívida Líquida:** R$ {float(paper_info2["Div_Liquida"].iloc[0]):,.2f}
+
+        **P/L:** {float(paper_info2["PL"].iloc[0]):,.2f}
+
+        **Dividend Yield:** {paper_info2["Div_Yield"].iloc[0]}
+            """
+                )
 
 
 def main():
