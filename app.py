@@ -9,7 +9,12 @@ import seaborn as sns
 import streamlit as st
 import yfinance as yf
 
-MENU_ITEMS = ["Home", "Panorama do Mercado", "Mapa Mensal", "Fundamentos"]
+MENU_ITEMS = [
+    "Home",
+    "Panorama do Mercado",
+    # "Mapa Mensal",
+    "Fundamentos",
+]
 
 
 def home():
@@ -277,9 +282,9 @@ def main():
         home()
     if menu_choice == MENU_ITEMS[1]:  # Panorama do Mercado
         overview()
-    if menu_choice == MENU_ITEMS[2]:  # Mapa Mensal
-        monthly_map()
-    if menu_choice == MENU_ITEMS[3]:  # Fundamentos
+    # if menu_choice == MENU_ITEMS[2]:  # Mapa Mensal
+    #     monthly_map()
+    if menu_choice == MENU_ITEMS[2]:  # Fundamentos
         fundamentals()
 
 
